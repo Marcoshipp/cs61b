@@ -31,8 +31,7 @@ public class ArrayDeque<T> {
         T[] a;
         if (flag == -1) {
             a = (T[]) new Object[this.length / 2];
-        }
-        else {
+        } else {
             a = (T[]) new Object[this.length * 2];
         }
         int arrIndex = 0;
@@ -48,8 +47,7 @@ public class ArrayDeque<T> {
         // resetting all pointers
         if (flag == -1) {
             this.length /= 2;
-        }
-        else {
+        } else {
             this.length *= 2;
         }
         this.items = a;
@@ -106,6 +104,9 @@ public class ArrayDeque<T> {
     }
 
     public T removeFirst() {
+        if (this.size == 0) {
+            return null;
+        }
         this.front = addOne(this.front);
         T returnItem = this.items[this.front];
         this.items[this.front] = null;
@@ -117,6 +118,9 @@ public class ArrayDeque<T> {
     }
 
     public T removeLast() {
+        if (this.size == 0) {
+            return null;
+        }
         this.back = minusOne(this.back);
         T returnItem = this.items[this.back];
         this.items[this.back] = null;

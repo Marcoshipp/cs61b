@@ -1,5 +1,5 @@
 public class LinkedListDeque<T> {
-    public class IntNode {
+    private class IntNode {
         public IntNode prev;
         public T item;
         public IntNode next;
@@ -47,8 +47,7 @@ public class LinkedListDeque<T> {
         while (p != this.sentinal) {
             if (p.next == this.sentinal) {
                 System.out.print(p.item + "\n");
-            }
-            else {
+            } else {
                 System.out.print(p.item + " ");
             }
             p = p.next;
@@ -99,6 +98,4 @@ public class LinkedListDeque<T> {
         }
         return getRecursive(index, this.sentinal.next);
     }
-
 }
-
