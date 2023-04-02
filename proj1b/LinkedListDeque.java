@@ -1,8 +1,8 @@
-public class LinkedListDeque<T> implements Deque<T>{
+public class LinkedListDeque<T> implements Deque<T> {
     private class IntNode {
-        public IntNode prev;
-        public T item;
-        public IntNode next;
+        private IntNode prev;
+        private T item;
+        private IntNode next;
 
         public IntNode(IntNode p, T x, IntNode n) {
             this.prev = p;
@@ -10,7 +10,7 @@ public class LinkedListDeque<T> implements Deque<T>{
             this.next = n;
         }
     }
-    
+
     private IntNode sentinal;
     private int size;
     public LinkedListDeque() {
@@ -70,7 +70,7 @@ public class LinkedListDeque<T> implements Deque<T>{
         this.size--;
         return r.item;
     }
-    
+
     @Override
     public T removeLast() {
         if (this.sentinal.prev == this.sentinal) {
@@ -99,7 +99,7 @@ public class LinkedListDeque<T> implements Deque<T>{
         }
         return getRecursive(index - 1, n.next);
     }
-    
+
     public T getRecursive(int index) {
         if (index >= this.size || index < 0) {
             return null;

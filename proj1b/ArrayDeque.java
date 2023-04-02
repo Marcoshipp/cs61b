@@ -1,4 +1,4 @@
-public class ArrayDeque<T> implements Deque<T>{
+public class ArrayDeque<T> implements Deque<T> {
     private int size;
     private int front;
     private int back;
@@ -59,12 +59,12 @@ public class ArrayDeque<T> implements Deque<T>{
     public boolean isEmpty() {
         return this.size == 0;
     }
-    
+
     @Override
     public int size() {
         return this.size;
     }
-    
+
     @Override
     public void printDeque() {
         int p1 = addOne(this.front);
@@ -88,7 +88,7 @@ public class ArrayDeque<T> implements Deque<T>{
         }
         return this.items[p];
     }
-    
+
     @Override
     public void addFirst(T item) {
         if (this.size == this.length) {
@@ -108,7 +108,7 @@ public class ArrayDeque<T> implements Deque<T>{
         this.back = addOne(this.back);
         this.size++;
     }
-    
+
     @Override
     public T removeFirst() {
         if (this.size == 0) {
