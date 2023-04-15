@@ -6,11 +6,11 @@ import java.util.Iterator;
 // TODO: Make sure to make this class extend AbstractBoundedQueue<t>
 public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T>{
     // index for the next dequeue or peek
-    public int first;
+    private int first;
     // index for the next dequeue or peek
-    public int last;
+    private int last;
     // Array for storing the buffer data.
-    public T[] rb;
+    private T[] rb;
 
 
     // done setting up the fields;
@@ -70,6 +70,9 @@ public class ArrayRingBuffer<T> extends AbstractBoundedQueue<T>{
      */
     public T peek() {
         // TODO: Return the first item. None of your instance variables should change.
+        if (isEmpty()) {
+            throw new RuntimeException("Ring buffer underflow");
+        }
         return this.rb[this.first];
     }
 
