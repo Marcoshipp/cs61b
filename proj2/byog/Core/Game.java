@@ -35,7 +35,8 @@ public class Game {
         // drawn if the same inputs had been given to playWithKeyboard().
 
         // generate
-        Random random = new Random(Integer.parseInt(input));
+        int seedValue = input.hashCode();
+        Random random = new Random(seedValue);
         WorldGeneration world = new WorldGeneration(WIDTH, HEIGHT, random);
         return world.generateWorld();
     }
