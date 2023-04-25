@@ -8,13 +8,13 @@ import java.util.Random;
 public class PercolationStats {
     private final int size;
     private final int T;
-    private final int[] opens;
+    private final double[] opens;
     public PercolationStats(int N, int T, PercolationFactory pf) {
         if (N <= 0 || T <= 0) {
             throw new IllegalArgumentException();
         }
         this.size = N;
-        this.opens = new int[T];
+        this.opens = new double[T];
         this.T = T;
         for (int times = 0; times < T; times++) {
             Percolation pc = new Percolation(size);
@@ -23,7 +23,7 @@ public class PercolationStats {
                 int col = StdRandom.uniform(0, size);
                 pc.open(row, col);
             }
-            this.opens[times] = pc.numberOfOpenSites();
+            this.opens[times] = (double) pc.numberOfOpenSites() / (N * N);
         }
     }
     public double mean() {
