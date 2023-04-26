@@ -34,12 +34,6 @@ public class Percolation {
     private int rcToIndex(int row, int col) {
         return row * this.size + col + 1;
     }
-
-    /**
-     * Open the row and the column
-     * @param row the row
-     * @param col the column
-     */
     public void open(int row, int col) {
         checkIndexError(row, col);
         if (isOpen(row, col)) {
@@ -47,6 +41,12 @@ public class Percolation {
         }
         this.sites[row][col] = true;
         this.openSites += 1;
+        if (this.size == 1 && row == 0 && col == 0) {
+            this.uf.union(rcToIndex(row, col), 0);
+            this.uf2.union(rcToIndex(row, col), 0);
+            this.uf.union(rcToIndex(row, col), this.size * this.size + 1);
+            return;
+        }
         if (row == 0) {
             this.uf.union(rcToIndex(row, col), 0);
             this.uf2.union(rcToIndex(row, col), 0);
@@ -179,5 +179,9 @@ public class Percolation {
 
     public boolean percolates() {
         return this.uf.connected(0, this.size * this.size + 1);
+    }
+
+    public static void main(String[] args) {
+
     }
 }
