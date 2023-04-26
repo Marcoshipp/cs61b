@@ -3,24 +3,20 @@ package hw2;
 import edu.princeton.cs.introcs.StdRandom;
 import edu.princeton.cs.introcs.StdStats;
 
-import java.util.Random;
-
 public class PercolationStats {
-    private final int size;
     private final int T;
     private final double[] opens;
     public PercolationStats(int N, int T, PercolationFactory pf) {
         if (N <= 0 || T <= 0) {
             throw new IllegalArgumentException();
         }
-        this.size = N;
         this.opens = new double[T];
         this.T = T;
         for (int times = 0; times < T; times++) {
-            Percolation pc = new Percolation(size);
+            Percolation pc = pf.make(N);
             while (!pc.percolates()) {
-                int row = StdRandom.uniform(0, size);
-                int col = StdRandom.uniform(0, size);
+                int row = StdRandom.uniform(0, N);
+                int col = StdRandom.uniform(0, N);
                 pc.open(row, col);
             }
             this.opens[times] = (double) pc.numberOfOpenSites() / (N * N);
