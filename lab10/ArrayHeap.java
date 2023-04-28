@@ -128,13 +128,14 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         validateSinkSwimArg(index);
 
         /** TODO: Your code here. */
-        // bubbles down to the left most node that has greater priority
         if (index >= size) {
             return;
         }
         int leftIndex = leftIndex(index);
         int rightIndex = rightIndex(index);
         int yieldMan = min(leftIndex, rightIndex);
+        // if the current node has a priority less than its children
+        // stop
         if (min(index, yieldMan) == index) {
             return;
         }
@@ -224,7 +225,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         // first, find the node that stores the item
         // second, change the node's priority
         // finally, make it either swim up, or sink down by comparing his current and previous priority
-        for (int i = 1; i < size(); i++) {
+        for (int i = 1; i <= size(); i++) {
             if (contents[i].item().equals(item)) {
                 double prev = contents[i].myPriority;
                 contents[i].myPriority = priority;
