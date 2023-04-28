@@ -129,6 +129,9 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
 
         /** TODO: Your code here. */
         // bubbles down to the left most node that has greater priority
+        if (index >= size) {
+            return;
+        }
         int leftIndex = leftIndex(index);
         int rightIndex = rightIndex(index);
         int yieldMan = min(leftIndex, rightIndex);
@@ -223,16 +226,15 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         // finally, make it either swim up, or sink down by comparing his current and previous priority
         for (int i = 1; i < size(); i++) {
             if (contents[i].item().equals(item)) {
-                Node prev = contents[i];
-                int index = i;
-                contents[i] = new Node(item, priority);
+                double prev = contents[i].myPriority;
+                contents[i].myPriority = priority;
                 // if previous priority is less than the current priority
                 // it means the node's priority has increased, so sink down
-                if (prev.myPriority < contents[index].myPriority) {
-                    sink(index);
+                if (prev < contents[i].myPriority) {
+                    sink(i);
                 }
                 else {
-                    swim(index);
+                    swim(i);
                 }
                 break;
             }
