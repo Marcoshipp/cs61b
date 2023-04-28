@@ -28,7 +28,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
      */
     private static int leftIndex(int i) {
         /* TODO: Your code here! */
-        return 0;
+        return 2 * i;
     }
 
     /**
@@ -36,7 +36,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
      */
     private static int rightIndex(int i) {
         /* TODO: Your code here! */
-        return 0;
+        return 2 * i + 1;
     }
 
     /**
@@ -44,7 +44,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
      */
     private static int parentIndex(int i) {
         /* TODO: Your code here! */
-        return 0;
+        return i / 2;
     }
 
     /**
@@ -108,7 +108,16 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         validateSinkSwimArg(index);
 
         /** TODO: Your code here. */
-        return;
+        // while the current node's priority is still larger than, swim up
+        int parentIndex = parentIndex(index);
+        if (index <= 1) {
+            return;
+        }
+        if (min(index, parentIndex) == parentIndex) {
+            return;
+        }
+        swap(index, parentIndex);
+        swim(parentIndex);
     }
 
     /**
@@ -119,7 +128,20 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         validateSinkSwimArg(index);
 
         /** TODO: Your code here. */
-        return;
+        // bubbles down to the left most node that has greater priority
+        int leftIndex = leftIndex(index);
+        int rightIndex = rightIndex(index);
+        int yieldMan = min(leftIndex, rightIndex);
+        if (min(index, yieldMan) == index) {
+            return;
+        }
+        if (yieldMan == leftIndex) {
+            swap(index, leftIndex);
+            sink(leftIndex);
+        } else {
+            swap(index, rightIndex);
+            sink(rightIndex);
+        }
     }
 
     /**
@@ -132,8 +154,10 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         if (size + 1 == contents.length) {
             resize(contents.length * 2);
         }
-
         /* TODO: Your code here! */
+        size++;
+        contents[size] = new Node(item, priority);
+        swim(size);
     }
 
     /**
@@ -143,7 +167,7 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
     @Override
     public T peek() {
         /* TODO: Your code here! */
-        return null;
+        return contents[1].item();
     }
 
     /**
@@ -158,7 +182,19 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
     @Override
     public T removeMin() {
         /* TODO: Your code here! */
-        return null;
+        // return null if removeMin isn't available
+        if (size == 0) {
+            return null;
+        }
+        // store the current min, then swap the first and last item
+        T returnItem = contents[1].item();
+        swap(1, size);
+        // remove the last item
+        contents[size] = null;
+        size--;
+        // make the top sink
+        sink(1);
+        return returnItem;
     }
 
     /**
@@ -181,6 +217,26 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
     @Override
     public void changePriority(T item, double priority) {
         /* TODO: Your code here! */
+        // to change the priority of a given item
+        // first, find the node that stores the item
+        // second, change the node's priority
+        // finally, make it either swim up, or sink down by comparing his current and previous priority
+        for (int i = 1; i < size(); i++) {
+            if (contents[i].item().equals(item)) {
+                Node prev = contents[i];
+                int index = i;
+                contents[i] = new Node(item, priority);
+                // if previous priority is less than the current priority
+                // it means the node's priority has increased, so sink down
+                if (prev.myPriority < contents[index].myPriority) {
+                    sink(index);
+                }
+                else {
+                    swim(index);
+                }
+                break;
+            }
+        }
         return;
     }
 
