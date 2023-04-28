@@ -197,7 +197,9 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
         contents[size] = null;
         size--;
         // make the top sink
-        sink(1);
+        if (size > 1) {
+            sink(1);
+        }
         return returnItem;
     }
 
@@ -472,5 +474,4 @@ public class ArrayHeap<T> implements ExtrinsicPQ<T> {
             i += 1;
         }
     }
-
 }
