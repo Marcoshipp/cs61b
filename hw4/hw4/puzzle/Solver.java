@@ -6,12 +6,12 @@ import java.util.ArrayList;
 public class Solver {
     private SearchNode n;
     private class SearchNode implements Comparable {
-        public int movesFromOrigin;
-        public WorldState ws;
-        public ArrayList<WorldState> worldStates;
-        public WorldState last;
+        private int movesFromOrigin;
+        private WorldState ws;
+        private ArrayList<WorldState> worldStates;
+        private WorldState last;
 
-        public SearchNode (WorldState initial, WorldState last, int x, ArrayList<WorldState> worldStates) {
+        SearchNode(WorldState initial, WorldState last, int x, ArrayList<WorldState> worldStates) {
             this.last = last;
             movesFromOrigin = x;
             ws = initial;
@@ -22,7 +22,8 @@ public class Solver {
         @Override
         public int compareTo(Object o) {
             SearchNode other = (SearchNode) o;
-            return Integer.compare(this.movesFromOrigin + this.ws.estimatedDistanceToGoal(), other.movesFromOrigin + other.ws.estimatedDistanceToGoal());
+            return Integer.compare(this.movesFromOrigin + this.ws.estimatedDistanceToGoal(),
+                    other.movesFromOrigin + other.ws.estimatedDistanceToGoal());
         }
     }
     public Solver(WorldState initial) {

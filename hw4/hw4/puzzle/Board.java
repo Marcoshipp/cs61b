@@ -1,11 +1,7 @@
 package hw4.puzzle;
 
 import edu.princeton.cs.algs4.Queue;
-import edu.princeton.cs.algs4.StdOut;
-
-import javax.sound.midi.SysexMessage;
-
-public class Board implements WorldState{
+public class Board implements WorldState {
     private int[][] tiles;
     public Board(int[][] tiles) {
         this.tiles = new int[tiles.length][tiles.length];
@@ -104,21 +100,23 @@ public class Board implements WorldState{
     }
     public boolean equals(Object y) {
         if (y == null) {
-            return this == null;
+            return false;
         }
         if (y.getClass() != this.getClass()) {
             return false;
         }
         Board other = (Board) y;
-        boolean result = true;
+        if (other.size() != this.size()) {
+            return false;
+        }
         for (int i = 0; i < size(); i++) {
             for (int j = 0; j < size(); j++) {
                 if (other.tiles[i][j] != this.tiles[i][j]) {
-                    result = false;
+                    return false;
                 }
             }
         }
-        return result;
+        return true;
     }
     public String toString() {
         StringBuilder s = new StringBuilder();
@@ -126,7 +124,7 @@ public class Board implements WorldState{
         s.append(N + "\n");
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
-                s.append(String.format("%2d ", tileAt(i,j)));
+                s.append(String.format("%2d ", tileAt(i, j)));
             }
             s.append("\n");
         }
