@@ -1,12 +1,14 @@
 import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -20,6 +22,50 @@ import java.util.ArrayList;
 public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
+
+    private class Node {
+        private final long id;
+        private final double lat;
+        private final double lon;
+
+        public Node(long id, double lon, double lat) {
+            this.id = id;
+            this.lat = lat;
+            this.lon = lon;
+        }
+
+        public long getId() {
+            return id;
+        }
+        public double getLon() {
+            return lon;
+        }
+        public double getLat() {
+            return lat;
+        }
+
+        @Override
+        public String toString() {
+            return Long.toString(id);
+        }
+    }
+
+    private class Edge {
+        // this class stores outgoing edges of nodes
+        ArrayList<Node> edges;
+        ArrayList<Long> edgesInLong;
+        public Edge() {
+            this.edges = new ArrayList<>();
+            this.edgesInLong = new ArrayList<>();
+        }
+        @Override
+        public String toString() {
+            return edges.toString();
+        }
+    }
+
+    private final Map<Long, Node> verticesToNode = new HashMap<>();
+    private final Map<Node, Edge> adjacecyList = new HashMap<>();
 
     /**
      * Example constructor shows how to create and start an XML parser.
@@ -58,6 +104,13 @@ public class GraphDB {
      */
     private void clean() {
         // TODO: Your code here.
+        ArrayList<Node> nodes = new ArrayList<>(this.adjacecyList.keySet());
+        for (Node n: nodes) {
+            if (this.adjacecyList.get(n).edges.size() == 0) {
+                this.adjacecyList.remove(n);
+                this.verticesToNode.remove(n.getId());
+            }
+        }
     }
 
     /**
@@ -66,7 +119,7 @@ public class GraphDB {
      */
     Iterable<Long> vertices() {
         //YOUR CODE HERE, this currently returns only an empty list.
-        return new ArrayList<Long>();
+        return verticesToNode.keySet();
     }
 
     /**
@@ -75,7 +128,8 @@ public class GraphDB {
      * @return An iterable of the ids of the neighbors of v.
      */
     Iterable<Long> adjacent(long v) {
-        return null;
+        Node n = this.verticesToNode.get(v);
+        return this.adjacecyList.get(n).edgesInLong;
     }
 
     /**
@@ -136,7 +190,17 @@ public class GraphDB {
      * @return The id of the node in the graph closest to the target.
      */
     long closest(double lon, double lat) {
-        return 0;
+        long closestId = 0;
+        double maxDist = 10000000;
+        for (long id: vertices()) {
+            Node node = this.verticesToNode.get(id);
+            double distance = Math.abs(distance(node.getLon(), node.getLat(), lon, lat));
+            if (distance < maxDist) {
+                maxDist = distance;
+                closestId = node.getId();
+            }
+        }
+        return closestId;
     }
 
     /**
@@ -145,7 +209,7 @@ public class GraphDB {
      * @return The longitude of the vertex.
      */
     double lon(long v) {
-        return 0;
+        return this.verticesToNode.get(v).getLon();
     }
 
     /**
@@ -154,6 +218,35 @@ public class GraphDB {
      * @return The latitude of the vertex.
      */
     double lat(long v) {
-        return 0;
+        return this.verticesToNode.get(v).getLat();
+    }
+
+    /**
+     * Insert the given Node into the graph
+     * @param id The id of the vertex.
+     * @param lon The longitude of the vertex
+     * @param lat The latitude of the vertex.
+     */
+    void addNode(long id, double lon, double lat) {
+        Node node = new Node(id, lon, lat);
+        this.verticesToNode.put(id, node);
+        this.adjacecyList.put(node, new Edge());
+    }
+
+    void addEdge(long id, Iterable<Long> ids) {
+        Node node = this.verticesToNode.get(id);
+        for (long ID: ids) {
+            Node n = this.verticesToNode.get(ID);
+            this.adjacecyList.get(node).edges.add(n);
+            this.adjacecyList.get(n).edges.add(node);
+            this.adjacecyList.get(node).edgesInLong.add(n.getId());
+            this.adjacecyList.get(n).edgesInLong.add(node.getId());
+        }
+    }
+
+    void printConnections() {
+        for (Node node : adjacecyList.keySet()) {
+            System.out.println("Node: " + node + ": " + adjacecyList.get(node));
+        }
     }
 }
