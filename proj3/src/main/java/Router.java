@@ -1,5 +1,4 @@
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,6 +11,53 @@ import java.util.regex.Pattern;
  * down to the priority you use to order your vertices.
  */
 public class Router {
+    private static class SearchNode implements Comparable<SearchNode>{
+        public final long id;
+        public final long startId;
+        public final long destId;
+        public final GraphDB g;
+        public double distFromStart;
+        public double distToEnd;
+
+        SearchNode(GraphDB g, long id, long startId, long destId, double distFromStart) {
+            this.id = id;
+            this.g = g;
+            this.startId = startId;
+            this.destId = destId;
+            this.distFromStart = distFromStart;
+            this.distToEnd = this.g.distance(id, destId);
+        }
+        public double getEstimate() {
+            return this.distFromStart + this.distToEnd;
+        }
+
+        public boolean isGoal() {
+            return this.g.distance(id, destId) == 0;
+        }
+
+        @Override
+        public int compareTo(SearchNode o) {
+            return Double.compare(this.getEstimate(), o.getEstimate());
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            SearchNode other = (SearchNode) obj;
+            return id == other.id;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.id);
+        }
+    }
+
     /**
      * Return a List of longs representing the shortest path from the node
      * closest to a start location and the node closest to the destination
@@ -25,7 +71,36 @@ public class Router {
      */
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
-        return null; // FIXME
+        List<Long> result = new ArrayList<>();
+        Map<Long, Boolean> marked = new HashMap<>();
+        Map<Long, Long> edgeTo = new HashMap<>();
+        long startId = g.closest(stlon, stlat);
+        long destId = g.closest(destlon, destlat);
+        PriorityQueue<SearchNode> pq = new PriorityQueue<>();
+        SearchNode startNode = new SearchNode(g, startId, startId, destId, 0);
+        pq.add(startNode);
+        while (!pq.isEmpty()) {
+            SearchNode curNode = pq.poll();
+            marked.put(curNode.id, true);
+            if (curNode.isGoal()) {
+                break;
+            }
+            for (long wId : g.adjacent(curNode.id)) {
+                if (!marked.containsKey(wId)) {
+                    SearchNode w = new SearchNode(g, wId, startId, destId, curNode.distFromStart + g.distance(curNode.id, wId));
+                    edgeTo.put(wId, curNode.id);
+                    pq.offer(w);
+                }
+            }
+        }
+        long id = destId;
+        while (id != startId) {
+            result.add(id);
+            id = edgeTo.get(id);
+        }
+        result.add(id);
+        Collections.reverse(result);
+        return result;
     }
 
     /**
