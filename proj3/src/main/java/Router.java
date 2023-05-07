@@ -12,52 +12,29 @@ import java.util.regex.Pattern;
  */
 public class Router {
     private static class SearchNode implements Comparable<SearchNode> {
-        public final long id;
-        public final long startId;
-        public final long destId;
-        public final GraphDB g;
-        public double distFromStart;
-        public double distToEnd;
-
-        SearchNode(GraphDB g, long id, long startId, long destId, double distFromStart) {
-            this.id = id;
+        long id;
+        long destId;
+        SearchNode parent;
+        GraphDB g;
+        double distToStart;
+        double h;
+        SearchNode (GraphDB g, long id, long destId, SearchNode parent, double distToStart) {
             this.g = g;
-            this.startId = startId;
+            this.id = id;
             this.destId = destId;
-            this.distFromStart = distFromStart;
-            this.distToEnd = this.g.distance(id, destId);
+            this.parent = parent;
+            this.distToStart = distToStart;
+            this.h = g.distance(id, destId);
         }
-        public double getEstimate() {
-            return this.distFromStart + this.distToEnd;
-        }
-
-        public boolean isGoal() {
-            return this.g.distance(id, destId) == 0;
-        }
-
         @Override
-        public int compareTo(SearchNode o) {
-            return Double.compare(this.getEstimate(), o.getEstimate());
+        public int compareTo(SearchNode other) {
+            return Double.compare(this.h + this.distToStart, other.h + other.distToStart);
         }
 
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null || getClass() != obj.getClass()) {
-                return false;
-            }
-            SearchNode other = (SearchNode) obj;
-            return id == other.id;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.id);
+        boolean isGoal() {
+            return this.h == 0;
         }
     }
-
     /**
      * Return a List of longs representing the shortest path from the node
      * closest to a start location and the node closest to the destination
@@ -71,35 +48,33 @@ public class Router {
      */
     public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
                                           double destlon, double destlat) {
-        List<Long> result = new ArrayList<>();
-        Map<Long, Boolean> marked = new HashMap<>();
-        Map<Long, Long> edgeTo = new HashMap<>();
         long startId = g.closest(stlon, stlat);
         long destId = g.closest(destlon, destlat);
+        SearchNode start = new SearchNode(g, startId, destId, null, 0);
+        HashMap<Long, Boolean> marked = new HashMap<>();
         PriorityQueue<SearchNode> pq = new PriorityQueue<>();
-        SearchNode startNode = new SearchNode(g, startId, startId, destId, 0);
-        pq.add(startNode);
+        List<SearchNode> resultPath = new ArrayList<>();
+        List<Long> result = new ArrayList<>();
+        pq.add(start);
         while (!pq.isEmpty()) {
-            SearchNode curNode = pq.poll();
-            marked.put(curNode.id, true);
-            if (curNode.isGoal()) {
+            SearchNode best = pq.poll();
+            marked.put(best.id, true);
+            if (best.isGoal()) {
+                resultPath.add(best);
                 break;
             }
-            for (long wId : g.adjacent(curNode.id)) {
-                if (!marked.containsKey(wId)) {
-                    double newDist = curNode.distFromStart + g.distance(curNode.id, wId);
-                    SearchNode w = new SearchNode(g, wId, startId, destId, newDist);
-                    edgeTo.put(wId, curNode.id);
-                    pq.offer(w);
+            for (long w: g.adjacent(best.id)) {
+                if (!marked.containsKey(w)) {
+                    double newDistToStart = best.distToStart + g.distance(w, best.id);
+                    pq.offer(new SearchNode(g, w, destId, best, newDistToStart));
                 }
             }
         }
-        long id = destId;
-        while (id != startId) {
-            result.add(id);
-            id = edgeTo.get(id);
+        SearchNode dest = resultPath.remove(0);
+        while (dest != null) {
+            result.add(dest.id);
+            dest = dest.parent;
         }
-        result.add(id);
         Collections.reverse(result);
         return result;
     }

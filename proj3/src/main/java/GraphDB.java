@@ -22,9 +22,9 @@ public class GraphDB {
      * creating helper classes, e.g. Node, Edge, etc. */
 
     class Node {
-        private final long id;
-        private final double lat;
-        private final double lon;
+        final long id;
+        final double lat;
+        final double lon;
 
         public Node(long id, double lon, double lat) {
             this.id = id;
@@ -80,7 +80,7 @@ public class GraphDB {
     }
 
     private final Map<Long, Node> verticesToNode = new HashMap<>();
-    private final Map<Node, Edge> adjacecyList = new HashMap<>();
+    private final Map<Node, Edge> adjacencyList = new HashMap<>();
 
     /**
      * Example constructor shows how to create and start an XML parser.
@@ -120,15 +120,14 @@ public class GraphDB {
     private void clean() {
         Set<Node> nodesToRemove = new HashSet<>();
 
-        for (Map.Entry<Node, Edge> entry : adjacecyList.entrySet()) {
+        for (Map.Entry<Node, Edge> entry : adjacencyList.entrySet()) {
             if (entry.getValue().edges.isEmpty()) {
                 nodesToRemove.add(entry.getKey());
             }
         }
 
         for (Node node : nodesToRemove) {
-            adjacecyList.remove(node);
-            verticesToNode.remove(node.getId());
+            adjacencyList.remove(node);
         }
     }
 
@@ -139,7 +138,11 @@ public class GraphDB {
      */
     Iterable<Long> vertices() {
         //YOUR CODE HERE, this currently returns only an empty list.
-        return verticesToNode.keySet();
+        ArrayList<Long> vertices = new ArrayList<>();
+        for (Node n: adjacencyList.keySet()) {
+            vertices.add(n.getId());
+        }
+        return vertices;
     }
 
     /**
@@ -149,7 +152,7 @@ public class GraphDB {
      */
     Iterable<Long> adjacent(long v) {
         Node n = this.verticesToNode.get(v);
-        return this.adjacecyList.get(n).edgesInLong;
+        return this.adjacencyList.get(n).edgesInLong;
     }
 
     /**
@@ -249,22 +252,22 @@ public class GraphDB {
     void addNode(long id, double lon, double lat) {
         Node node = new Node(id, lon, lat);
         this.verticesToNode.put(id, node);
-        this.adjacecyList.put(node, new Edge());
+        this.adjacencyList.put(node, new Edge());
     }
 
     void addEdge(long id, ArrayList<Long> ids) {
         Node node = this.verticesToNode.get(id);
         if (ids.size() == 1) {
             Node n = this.verticesToNode.get(ids.get(0));
-            this.adjacecyList.get(node).edges.add(n);
-            this.adjacecyList.get(n).edgesInLong.add(node.getId());
+            this.adjacencyList.get(node).edges.add(n);
+            this.adjacencyList.get(n).edgesInLong.add(node.getId());
         } else if (ids.size() == 2) {
             Node n1 = this.verticesToNode.get(ids.get(0));
             Node n2 = this.verticesToNode.get(ids.get(1));
-            this.adjacecyList.get(node).edges.add(n1);
-            this.adjacecyList.get(n1).edgesInLong.add(node.getId());
-            this.adjacecyList.get(node).edges.add(n2);
-            this.adjacecyList.get(n2).edgesInLong.add(node.getId());
+            this.adjacencyList.get(node).edges.add(n1);
+            this.adjacencyList.get(n1).edgesInLong.add(node.getId());
+            this.adjacencyList.get(node).edges.add(n2);
+            this.adjacencyList.get(n2).edgesInLong.add(node.getId());
         }
     }
 
@@ -273,8 +276,8 @@ public class GraphDB {
     }
 
     void printConnections() {
-        for (Node node : adjacecyList.keySet()) {
-            System.out.println("Node: " + node + ": " + adjacecyList.get(node));
+        for (Node node : adjacencyList.keySet()) {
+            System.out.println("Node: " + node + ": " + adjacencyList.get(node));
         }
     }
 }
