@@ -70,6 +70,9 @@ public class Router {
                 }
             }
         }
+        if (resultPath.size() == 0) {
+            return result;
+        }
         SearchNode dest = resultPath.remove(0);
         while (dest != null) {
             result.add(dest.id);
