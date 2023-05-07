@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * down to the priority you use to order your vertices.
  */
 public class Router {
-    private static class SearchNode implements Comparable<SearchNode>{
+    private static class SearchNode implements Comparable<SearchNode> {
         public final long id;
         public final long startId;
         public final long destId;
@@ -87,7 +87,8 @@ public class Router {
             }
             for (long wId : g.adjacent(curNode.id)) {
                 if (!marked.containsKey(wId)) {
-                    SearchNode w = new SearchNode(g, wId, startId, destId, curNode.distFromStart + g.distance(curNode.id, wId));
+                    double newDist = curNode.distFromStart + g.distance(curNode.id, wId);
+                    SearchNode w = new SearchNode(g, wId, startId, destId, newDist);
                     edgeTo.put(wId, curNode.id);
                     pq.offer(w);
                 }

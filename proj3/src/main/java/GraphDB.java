@@ -6,9 +6,7 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -23,7 +21,7 @@ public class GraphDB {
     /** Your instance variables for storing the graph. You should consider
      * creating helper classes, e.g. Node, Edge, etc. */
 
-    private class Node {
+    class Node {
         private final long id;
         private final double lat;
         private final double lon;
@@ -48,15 +46,32 @@ public class GraphDB {
         public String toString() {
             return Long.toString(id);
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+            Node other = (Node) obj;
+            return this.id == other.id;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id);
+        }
     }
 
-    private class Edge {
+    class Edge {
         // this class stores outgoing edges of nodes
-        ArrayList<Node> edges;
-        ArrayList<Long> edgesInLong;
+        HashSet<Node> edges;
+        HashSet<Long> edgesInLong;
         public Edge() {
-            this.edges = new ArrayList<>();
-            this.edgesInLong = new ArrayList<>();
+            this.edges = new HashSet<>();
+            this.edgesInLong = new HashSet<>();
         }
         @Override
         public String toString() {
@@ -103,15 +118,20 @@ public class GraphDB {
      *  we can reasonably assume this since typically roads are connected.
      */
     private void clean() {
-        // TODO: Your code here.
-        ArrayList<Node> nodes = new ArrayList<>(this.adjacecyList.keySet());
-        for (Node n: nodes) {
-            if (this.adjacecyList.get(n).edges.size() == 0) {
-                this.adjacecyList.remove(n);
-                this.verticesToNode.remove(n.getId());
+        Set<Node> nodesToRemove = new HashSet<>();
+
+        for (Map.Entry<Node, Edge> entry : adjacecyList.entrySet()) {
+            if (entry.getValue().edges.isEmpty()) {
+                nodesToRemove.add(entry.getKey());
             }
         }
+
+        for (Node node : nodesToRemove) {
+            adjacecyList.remove(node);
+            verticesToNode.remove(node.getId());
+        }
     }
+
 
     /**
      * Returns an iterable of all vertex IDs in the graph.
@@ -193,11 +213,10 @@ public class GraphDB {
         long closestId = 0;
         double maxDist = 10000000;
         for (long id: vertices()) {
-            Node node = this.verticesToNode.get(id);
-            double distance = Math.abs(distance(node.getLon(), node.getLat(), lon, lat));
+            double distance = Math.abs(distance(this.verticesToNode.get(id).getLon(), this.verticesToNode.get(id).getLat(), lon, lat));
             if (distance < maxDist) {
                 maxDist = distance;
-                closestId = node.getId();
+                closestId = this.verticesToNode.get(id).getId();
             }
         }
         return closestId;
@@ -233,15 +252,24 @@ public class GraphDB {
         this.adjacecyList.put(node, new Edge());
     }
 
-    void addEdge(long id, Iterable<Long> ids) {
+    void addEdge(long id, ArrayList<Long> ids) {
         Node node = this.verticesToNode.get(id);
-        for (long ID: ids) {
-            Node n = this.verticesToNode.get(ID);
+        if (ids.size() == 1) {
+            Node n = this.verticesToNode.get(ids.get(0));
             this.adjacecyList.get(node).edges.add(n);
-            this.adjacecyList.get(n).edges.add(node);
-            this.adjacecyList.get(node).edgesInLong.add(n.getId());
             this.adjacecyList.get(n).edgesInLong.add(node.getId());
+        } else if (ids.size() == 2) {
+            Node n1 = this.verticesToNode.get(ids.get(0));
+            Node n2 = this.verticesToNode.get(ids.get(1));
+            this.adjacecyList.get(node).edges.add(n1);
+            this.adjacecyList.get(n1).edgesInLong.add(node.getId());
+            this.adjacecyList.get(node).edges.add(n2);
+            this.adjacecyList.get(n2).edgesInLong.add(node.getId());
         }
+    }
+
+    Node getNode(long id) {
+        return this.verticesToNode.get(id);
     }
 
     void printConnections() {
