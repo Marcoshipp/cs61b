@@ -70,10 +70,14 @@ public class QuickSort {
         if (allDuplicates(items)) {
             return items;
         }
+        Queue<Item> copied = new Queue<>();
+        for (Item x: items) {
+            copied.enqueue(x);
+        }
         Queue<Item> les = new Queue<>();
         Queue<Item> eq = new Queue<>();
         Queue<Item> lar = new Queue<>();
-        partition(items, getRandomItem(items), les, eq, lar);
+        partition(copied, getRandomItem(copied), les, eq, lar);
         Queue<Item> sortedLeft = quickSort(les);
         Queue<Item> sortedMid = quickSort(eq);
         Queue<Item> sortedRight = quickSort(lar);
@@ -103,5 +107,6 @@ public class QuickSort {
         students.enqueue(6);
         students.enqueue(6);
         System.out.println(quickSort(students));
+        System.out.println(students);
     }
 }
