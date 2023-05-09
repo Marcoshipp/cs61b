@@ -1,5 +1,7 @@
 import edu.princeton.cs.algs4.Queue;
 
+import javax.swing.*;
+
 public class QuickSort {
     /**
      * Returns a new queue that contains the given queues catenated together.
@@ -48,12 +50,58 @@ public class QuickSort {
             Queue<Item> unsorted, Item pivot,
             Queue<Item> less, Queue<Item> equal, Queue<Item> greater) {
         // Your code here!
+        while (!unsorted.isEmpty()) {
+            Item item = unsorted.dequeue();
+            int cmp = pivot.compareTo(item);
+            if (cmp > 0) {
+                less.enqueue(item);
+            } else if (cmp == 0) {
+                equal.enqueue(item);
+            } else {
+                greater.enqueue(item);
+            }
+        }
     }
 
     /** Returns a Queue that contains the given items sorted from least to greatest. */
     public static <Item extends Comparable> Queue<Item> quickSort(
             Queue<Item> items) {
         // Your code here!
-        return items;
+        if (allDuplicates(items)) {
+            return items;
+        }
+        Queue<Item> les = new Queue<>();
+        Queue<Item> eq = new Queue<>();
+        Queue<Item> lar = new Queue<>();
+        partition(items, getRandomItem(items), les, eq, lar);
+        Queue<Item> sortedLeft = quickSort(les);
+        Queue<Item> sortedMid = quickSort(eq);
+        Queue<Item> sortedRight = quickSort(lar);
+        return catenate(sortedLeft, catenate(sortedMid, sortedRight));
+    }
+
+    private static <Item> boolean allDuplicates(Queue<Item> items) {
+        if (items.size() <= 1) {
+            return true;
+        }
+        Item item = items.peek();
+        for (Item x: items) {
+            if (!x.equals(item)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+        Queue<Integer> students = new Queue<>();
+        students.enqueue(1);
+        students.enqueue(2);
+        students.enqueue(3);
+        students.enqueue(4);
+        students.enqueue(5);
+        students.enqueue(6);
+        students.enqueue(6);
+        System.out.println(quickSort(students));
     }
 }
