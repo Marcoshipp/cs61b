@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 /**
  * Class with 2 ways of doing Counting sort, one naive way and one "better" way
  *
@@ -67,6 +69,42 @@ public class CountingSort {
      */
     public static int[] betterCountingSort(int[] arr) {
         // TODO make counting sort work with arrays containing negative numbers.
-        return null;
+        HashMap<Integer, Integer> counts = new HashMap<>();
+        HashMap<Integer, Integer> starts = new HashMap<>();
+        // counting occurrence of elements
+        for (int i: arr) {
+            if (!counts.containsKey(i)) {
+                counts.put(i, 0);
+            }
+            counts.put(i, counts.get(i) + 1);
+        }
+        // storing
+        int pos = 0;
+        for (int i: arr) {
+            if (i < 0) {
+                if (!starts.containsKey(i)) {
+                    starts.put(i, pos);
+                    pos += counts.get(i);
+                }
+            }
+        }
+        int[] start2 = new int[arr.length];
+        for (int i = 0; i < start2.length; i += 1) {
+            if (!counts.containsKey(i)) continue;
+            start2[i] = pos;
+            pos += counts.get(i);
+        }
+        int[] sorted = new int[arr.length];
+        for (int i: arr) {
+            if (i < 0) {
+                sorted[starts.get(i)] = i;
+                starts.put(i, starts.get(i) + 1);
+            }
+            else {
+                sorted[start2[i]] = i;
+                start2[i] += 1;
+            }
+        }
+        return sorted;
     }
 }

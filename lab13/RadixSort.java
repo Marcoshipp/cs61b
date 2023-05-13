@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 /**
  * Class for doing Radix sort
  *
@@ -17,7 +19,23 @@ public class RadixSort {
      */
     public static String[] sort(String[] asciis) {
         // TODO: Implement LSD Sort
-        return null;
+        String max = "";
+        String[] dsa = new String[asciis.length];
+        int i = 0;
+        for (String s: asciis) {
+            if (s.length() > max.length()) {
+                max = s;
+            }
+            dsa[i] = s;
+        }
+        int times = max.length();
+        int pointer = times - 1;
+        while (times > 0) {
+            sortHelperLSD(dsa, pointer);
+            pointer--;
+            times--;
+        }
+        return dsa;
     }
 
     /**
@@ -28,7 +46,39 @@ public class RadixSort {
      */
     private static void sortHelperLSD(String[] asciis, int index) {
         // Optional LSD helper method for required LSD radix sort
-        return;
+        int[] radix = new int[256];
+        for (String s: asciis) {
+            int c;
+            if (s.length() <= index) {
+                c = 0;
+            }
+            else {
+                c = s.charAt(index);
+            }
+            radix[c]++;
+        }
+        int pos = 0;
+        int[] start = new int[256];
+        for (int i = 0; i < start.length; i++) {
+            start[i] = pos;
+            pos += radix[i];
+        }
+        String[] sorted = new String[asciis.length];
+        for (String s : asciis) {
+            int c;
+            if (s.length() <= index) {
+                c = 0;
+            }
+            else {
+                c = s.charAt(index);
+            }
+            sorted[start[c]] = s;
+            start[c]++;
+        }
+        int i = 0;
+        for (String s : sorted) {
+            asciis[i++] = s;
+        }
     }
 
     /**
